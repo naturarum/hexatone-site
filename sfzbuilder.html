@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SFZ Builder — Hexatone</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d11;
+      --bg-card: #14141a;
+      --bg-card-hover: #1a1a22;
+      --text: #e4e4e8;
+      --text-muted: #a0a0ae;
+      --text-dim: #6b6b7a;
+      --accent: #ffa9c9;   /* pink */
+      --accent2: #8cb8ff;  /* blue */
+      --accent3: #cfa9ff;  /* lavender */
+      --accent4: #ffbd82;  /* orange */
+      --accent5: #9ee6e6;  /* cyan */
+      --border: #22222b;
+      --border-light: #2a2a35;
+      --ok: #9ee6e6;
+      --warn: #ffbd82;
+      --err: #ff8a9b;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+      --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+    }
+    body {
+      background: var(--bg); color: var(--text); font-family: var(--font);
+      line-height: 1.55; min-height: 100vh; -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
+
+    header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(13,13,17,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .logo {
+      width: 34px; height: 19.6px; flex-shrink: 0;
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: linear-gradient(120deg, var(--accent4), var(--accent), var(--accent3), var(--accent2));
+    }
+    .h-title { color: #f0f0f4; font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; }
+    .h-sub   { color: var(--text-dim); font-size: 0.72rem; letter-spacing: 0.04em; margin-top: 1px; }
+    #stats   { margin-left: auto; display: flex; gap: 8px; }
+    .pill {
+      padding: 4px 11px; border: 1px solid var(--border-light); background: var(--bg-card);
+      border-radius: 14px; font-size: 0.7rem; letter-spacing: 0.02em; font-weight: 600;
+    }
+
+    main { padding: 22px 24px 60px; max-width: 1040px; margin: 0 auto; }
+
+    .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px; align-items: center; gap: 4px; }
+    .tab  {
+      background: none; border: none; cursor: pointer; padding: 9px 18px;
+      font-size: 0.78rem; letter-spacing: 0.04em; font-family: inherit; font-weight: 600;
+      color: var(--text-dim); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s;
+    }
+    .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-right { margin-left: auto; display: flex; gap: 8px; }
+
+    .drop-zone {
+      border: 2px dashed var(--border-light); border-radius: var(--radius); padding: 64px 40px;
+      text-align: center; background: var(--bg-card); transition: all .2s;
+    }
+    .drop-zone.over { border-color: var(--accent); background: var(--bg-card-hover); }
+    .di {
+      width: 56px; height: 32px; margin: 0 auto 18px;
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: var(--border-light); transition: background .2s;
+    }
+    .drop-zone.over .di { background: linear-gradient(120deg, var(--accent4), var(--accent), var(--accent2)); }
+    .dt { font-size: 1.05rem; color: #eaeaef; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 8px; }
+    .ds { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 26px; }
+    .dbtns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .fmt-note { font-size: 0.78rem; color: var(--text-dim); margin-top: 22px; line-height: 1.6; }
+    .fmt-note b { color: var(--accent5); font-weight: 600; }
+
+    .btn {
+      background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text);
+      padding: 9px 20px; font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em;
+      border-radius: 22px; cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .btn:hover { background: var(--bg-card-hover); border-color: #3a3a48; }
+    .btn.sm  { padding: 6px 14px; font-size: 0.78rem; }
+    .btn.gst { background: none; }
+    .btn.pri {
+      background: linear-gradient(120deg, var(--accent), var(--accent3));
+      border: none; color: #1a1020; font-weight: 700;
+    }
+    .btn.pri:hover { filter: brightness(1.06); }
+    .btn.pri:disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; filter: none; }
+
+    .drop-mini {
+      border: 1px dashed var(--border-light); border-radius: var(--radius-sm);
+      padding: 11px 16px; text-align: center; margin-bottom: 16px;
+      font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.02em; transition: all .15s;
+    }
+    .drop-mini.over { border-color: var(--accent); background: var(--bg-card-hover); color: var(--accent); }
+
+    table  { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th     { padding: 8px 10px; font-size: 0.68rem; letter-spacing: 0.05em; font-weight: 600; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+    th.l   { text-align: left; } th.c { text-align: center; }
+    td     { padding: 6px 10px; border-bottom: 1px solid rgba(34,34,43,0.5); }
+    tr:not(.hdr):hover td { background: var(--bg-card); }
+    tr.excl td { opacity: .4; }
+
+    .note-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 12px; border: 1px solid transparent;
+      cursor: pointer; min-width: 46px; text-align: center; font-weight: 600; transition: border-color .15s;
+    }
+    .note-tag.kn  { color: var(--accent5); background: rgba(158,230,230,0.10); }
+    .note-tag.unk { color: var(--warn); background: rgba(255,189,130,0.10); }
+    .note-tag:hover { border-color: var(--accent); }
+
+    .edit-in {
+      width: 70px; padding: 3px 6px; text-align: center; background: var(--bg-card);
+      border: 1px solid var(--accent); color: var(--text); font-size: 0.85rem; font-family: inherit;
+      border-radius: 8px; outline: none;
+    }
+    .edit-in.err { border-color: var(--err); }
+
+    .xbtn {
+      background: none; border: 1px solid var(--border-light); color: var(--text-dim);
+      padding: 3px 10px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.02em;
+      border-radius: 12px; cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .xbtn:hover, .xbtn.on { border-color: var(--accent); color: var(--accent); }
+    .rbtn { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.1rem; transition: color .15s; }
+    .rbtn:hover { color: var(--err); }
+
+    .opt-bar { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; padding-top: 18px; margin-top: 4px; border-top: 1px solid var(--border); }
+    .opt-g   { display: flex; flex-direction: column; gap: 6px; }
+    .opt-l   { font-size: 0.68rem; letter-spacing: 0.05em; color: var(--text-dim); font-weight: 600; }
+    select, input[type=number] {
+      background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text);
+      padding: 7px 11px; font-size: 0.85rem; font-family: inherit; border-radius: 8px; outline: none;
+    }
+    select:focus, input:focus { border-color: var(--accent); }
+    select { min-width: 150px; }
+    input[type=number] { width: 84px; }
+
+    .gen-area { margin-left: auto; text-align: right; }
+    .wmsg { font-size: 0.78rem; color: var(--warn); margin-bottom: 8px; }
+
+    .prev-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+    .prev-meta { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.02em; }
+    .prev-btns { display: flex; gap: 8px; }
+    pre.sfz {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 22px; font-size: 0.82rem; line-height: 1.85; overflow: auto; max-height: 62vh;
+      white-space: pre; font-family: var(--mono);
+    }
+    .sc { color: var(--text-dim); }
+    .st { color: var(--accent); font-weight: 700; }
+    .sk { color: var(--accent2); }
+    .sv { color: var(--accent5); }
+    .se { color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+<input id="fi"  type="file" multiple accept=".wav,.flac,.aif,.aiff,.caf,.m4a,.mp3,.ogg" style="display:none">
+<input id="foi" type="file" multiple accept=".wav,.flac,.aif,.aiff,.caf,.m4a,.mp3,.ogg" style="display:none">
+
+<script>
+// ── Music utils ────────────────────────────────────────────────────────────
+const SEM = { C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11 };
+const MN = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const m2n = m => m == null ? '—' : MN[((m%12)+12)%12] + (Math.floor(m/12)-1);
+
+function n2m(str) {
+  const m = str.trim().match(/^([A-G][#b]?)(-?\d+)$/i);
+  if (!m) return null;
+  const n = m[1][0].toUpperCase() + m[1].slice(1).toLowerCase();
+  if (SEM[n] == null) return null;
+  const midi = (parseInt(m[2])+1)*12 + SEM[n];
+  return (midi>=0 && midi<=127) ? midi : null;
+}
+
+function detect(filename) {
+  const base = filename.replace(/\.[^/.]+$/,'');
+  const re = /(?:^|[_\-.\s])([A-G][#b]?)(-?\d)(?=[_\-.\s]|$)/gi;
+  let m;
+  while ((m=re.exec(base))!==null) {
+    const n = m[1][0].toUpperCase()+m[1].slice(1).toLowerCase();
+    if (SEM[n]!=null) { const midi=(parseInt(m[2])+1)*12+SEM[n]; if (midi>=0&&midi<=127) return midi; }
+  }
+  const end = base.match(/([A-G][#b]?)(-?\d)$/i);
+  if (end) {
+    const n = end[1][0].toUpperCase()+end[1].slice(1).toLowerCase();
+    if (SEM[n]!=null) { const midi=(parseInt(end[2])+1)*12+SEM[n]; if (midi>=0&&midi<=127) return midi; }
+  }
+  const num = base.match(/(?:^|[_\-.\s])(\d{2,3})(?=[_\-.\s]|$)/);
+  if (num) { const midi=parseInt(num[1]); if (midi>=21&&midi<=108) return midi; }
+  return null;
+}
+
+// Detect a velocity/dynamic layer tag in a filename (e.g. mf, pp, ff, p, f).
+const DYN_ORDER = ['ppp','pp','p','mp','mf','f','ff','fff'];
+function detectDyn(filename) {
+  const base = filename.replace(/\.[^/.]+$/,'').toLowerCase();
+  for (const d of [...DYN_ORDER].sort((a,b)=>b.length-a.length)) {
+    if (new RegExp(`(?:^|[_\\-.\\s])${d}(?=[_\\-.\\s]|$)`).test(base)) return d;
+  }
+  return null;
+}
+
+const OK_EXT  = /\.(wav|aif|aiff|caf|m4a|mp3)$/i;       // play in Hexatone
+const BAD_EXT = /\.(ogg)$/i;                            // not supported
+
+// Effective (shifted) MIDI for a file, clamped 0–127.
+function effMidi(f, opts) {
+  if (f.midi == null) return null;
+  const m = f.midi + opts.octave*12 + opts.semi;
+  return Math.min(127, Math.max(0, m));
+}
+
+function ranges(entries, opts) {
+  const s = [...entries].map(e=>({...e, eff: effMidi(e, opts)}))
+                        .filter(e=>e.eff!=null).sort((a,b)=>a.eff-b.eff);
+  return s.map((e,i)=>({
+    ...e,
+    lo: s[i-1] ? Math.floor((s[i-1].eff+e.eff)/2)+1 : 0,
+    hi: s[i+1] ? Math.floor((e.eff+s[i+1].eff)/2) : 127,
+  }));
+}
+
+function isIncluded(f, opts) {
+  if (f.excl || f.midi==null) return false;
+  if (opts.dyn!=='all' && f.dyn!==opts.dyn) return false;
+  return true;
+}
+
+function makeSFZ(files, opts) {
+  const valid = files.filter(f=>isIncluded(f,opts));
+  if (!valid.length) return '// No mappable samples.';
+  const reg = ranges(valid, opts);
+  const lines = [
+    `// Hexatone instrument`,
+    `// Generated ${new Date().toLocaleDateString('en-CA')} — ${valid.length} region${valid.length!==1?'s':''}`,
+  ];
+  if (opts.octave || opts.semi) lines.push(`// Pitch shifted by ${opts.octave} oct ${opts.semi>=0?'+':''}${opts.semi} st`);
+  lines.push('');
+  if (opts.loop!=='no_loop' || opts.vol!==0) {
+    lines.push('<global>');
+    if (opts.loop!=='no_loop') lines.push(`loop_mode=${opts.loop}`);
+    if (opts.vol!==0) lines.push(`volume=${opts.vol}`);
+    lines.push('');
+  }
+  for (const r of reg) {
+    lines.push('<region>');
+    lines.push(`sample=${r.path}`);
+    lines.push(`pitch_keycenter=${r.eff}`);
+    lines.push(`lokey=${r.lo}`);
+    lines.push(`hikey=${r.hi}`);
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+const S = {
+  files: [],
+  opts: { loop:'no_loop', vol:0, octave:0, semi:0, dyn:'all' },
+  view: 'drop',
+  sfz: '',
+};
+
+function addFiles(list) {
+  const items = Array.from(list)
+    .filter(f=>/\.(wav|flac|aif|aiff|caf|m4a|mp3|ogg)$/i.test(f.name))
+    .map(f=>({
+      id: Math.random().toString(36).slice(2),
+      filename: f.name,
+      path: f.webkitRelativePath ? f.webkitRelativePath.split('/').slice(1).join('/')||f.name : f.name,
+      midi: detect(f.name),
+      dyn: detectDyn(f.name),
+      bad: BAD_EXT.test(f.name),
+      excl: false,
+    }));
+  const seen = new Set(S.files.map(f=>f.path));
+  const fresh = items.filter(f=>!seen.has(f.path));
+  if (!fresh.length) return;
+  S.files = [...S.files, ...fresh];
+  S.view = 'files';
+  render();
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function sfzHL(sfz) {
+  return sfz.split('\n').map(line=>{
+    if (!line.trim()) return ' ';
+    if (line.startsWith('//')) return `<span class="sc">${esc(line)}</span>`;
+    if (/^<\w+>/.test(line.trim())) return `<span class="st">${esc(line)}</span>`;
+    if (line.includes('=')) {
+      const eq = line.indexOf('=');
+      return `<span class="sk">${esc(line.slice(0,eq))}</span><span class="se">=</span><span class="sv">${esc(line.slice(eq+1))}</span>`;
+    }
+    return esc(line);
+  }).join('\n');
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+let _delListen = null;
+
+function render() {
+  const app = document.getElementById('app');
+  const total  = S.files.length;
+  const valid  = S.files.filter(f=>isIncluded(f, S.opts));
+  const validN = valid.length;
+  const unknN  = S.files.filter(f=>!f.excl && f.midi==null).length;
+  const badN   = S.files.filter(f=>f.bad && !f.excl).length;
+  const dyns   = [...new Set(S.files.map(f=>f.dyn).filter(Boolean))].sort((a,b)=>DYN_ORDER.indexOf(a)-DYN_ORDER.indexOf(b));
+  const rmap   = Object.fromEntries(ranges(valid, S.opts).map(r=>[r.id,r]));
+  const rc     = S.sfz ? (S.sfz.match(/^<region>/mg)||[]).length : 0;
+
+  let html = `
+    <header>
+      <div class="logo"></div>
+      <div><div class="h-title">SFZ Builder</div><div class="h-sub">samples → Hexatone instrument</div></div>
+      ${total ? `<div id="stats">
+        <span class="pill" style="color:var(--text-muted)">${total} files</span>
+        <span class="pill" style="color:var(--accent5)">${validN} mapped</span>
+        ${unknN?`<span class="pill" style="color:var(--warn)">${unknN} unknown</span>`:''}
+      </div>` : ''}
+    </header>
+    <main>`;
+
+  if (total) {
+    html += `<div class="tabs">
+      <button class="tab${S.view==='files'?' on':''}" data-v="files">Samples</button>
+      <button class="tab${S.view==='preview'?' on':''}" data-v="preview">SFZ Output</button>
+      ${S.view==='files'?`<div class="tab-right">
+        <button class="btn gst sm" id="btn-af">+ Files</button>
+        <button class="btn gst sm" id="btn-afd">+ Folder</button>
+      </div>`:''}
+    </div>`;
+  }
+
+  if (S.view==='drop' || total===0) {
+    html += `<div id="dz" class="drop-zone">
+      <div class="di"></div>
+      <div class="dt">Drop your samples or a folder</div>
+      <div class="ds">Hexatone detects each note from the filename — review and tweak before exporting.</div>
+      <div class="dbtns">
+        <button class="btn pri" id="btn-sf">Select Files</button>
+        <button class="btn" id="btn-sfd">Select Folder</button>
+      </div>
+      <div class="fmt-note">
+        <b>Best:</b> WAV &amp; AIFF. Also works: CAF, M4A/AAC, MP3.
+        <b style="color:var(--warn)">Not supported:</b> OGG.<br>
+        Tip: an SFZ instrument is a <b>folder</b> — keep this .sfz next to its samples, then import the folder in Hexatone.
+      </div>
+    </div>`;
+
+  } else if (S.view==='files') {
+    html += `<div id="dm" class="drop-mini">Drop more files / a folder to add</div>
+    <div style="overflow-x:auto;margin-bottom:20px">
+    <table>
+      <thead><tr class="hdr">
+        <th class="l" style="width:30px">#</th>
+        <th class="l">Filename</th>
+        <th class="c" style="width:84px">Note</th>
+        <th class="c" style="width:52px">MIDI</th>
+        <th class="c" style="width:52px">Lo</th>
+        <th class="c" style="width:52px">Hi</th>
+        <th class="c" style="width:64px"></th>
+        <th class="c" style="width:34px"></th>
+      </tr></thead>
+      <tbody>`;
+    S.files.forEach((f,i)=>{
+      const r = rmap[f.id];
+      const nameColor = f.excl?'var(--text-dim)':f.bad?'var(--err)':f.midi==null?'var(--warn)':'var(--text)';
+      html += `<tr class="${f.excl?'excl':''}" data-id="${f.id}">
+        <td style="color:var(--text-dim)">${i+1}</td>
+        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${nameColor}" title="${esc(f.path)}${f.bad?' (OGG not supported)':''}">${f.bad?'⚠ ':''}${esc(f.path)}</td>
+        <td style="text-align:center" id="nc-${f.id}">
+          <span class="note-tag ${f.midi!=null?'kn':'unk'}" data-act="edit" data-id="${f.id}">${f.midi!=null?m2n(effMidi(f,S.opts)):'?'}</span>
+        </td>
+        <td style="text-align:center;color:var(--text-muted)">${f.midi!=null?effMidi(f,S.opts):'—'}</td>
+        <td style="text-align:center;color:var(--text-dim)">${r&&isIncluded(f,S.opts)?r.lo:'—'}</td>
+        <td style="text-align:center;color:var(--text-dim)">${r&&isIncluded(f,S.opts)?r.hi:'—'}</td>
+        <td style="text-align:center"><button class="xbtn${f.excl?' on':''}" data-act="excl" data-id="${f.id}">${f.excl?'Incl':'Excl'}</button></td>
+        <td style="text-align:center"><button class="rbtn" data-act="rm" data-id="${f.id}">×</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>
+    <div class="opt-bar">
+      <div class="opt-g">
+        <span class="opt-l">OCTAVE SHIFT</span>
+        <select id="opt-oct">
+          ${[-2,-1,0,1,2].map(v=>`<option value="${v}"${S.opts.octave===v?' selected':''}>${v>0?'+':''}${v} oct</option>`).join('')}
+        </select>
+      </div>
+      <div class="opt-g">
+        <span class="opt-l">SEMITONE</span>
+        <input type="number" id="opt-semi" value="${S.opts.semi}" min="-11" max="11">
+      </div>
+      ${dyns.length ? `<div class="opt-g">
+        <span class="opt-l">VELOCITY LAYER</span>
+        <select id="opt-dyn">
+          <option value="all"${S.opts.dyn==='all'?' selected':''}>All (${dyns.length} found)</option>
+          ${dyns.map(d=>`<option value="${d}"${S.opts.dyn===d?' selected':''}>${d.toUpperCase()} only</option>`).join('')}
+        </select>
+      </div>` : ''}
+      <div class="opt-g">
+        <span class="opt-l">LOOP MODE</span>
+        <select id="opt-loop">
+          ${['no_loop','loop_continuous','loop_sustain','one_shot'].map(v=>`<option value="${v}"${S.opts.loop===v?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="opt-g">
+        <span class="opt-l">VOLUME (dB)</span>
+        <input type="number" id="opt-vol" value="${S.opts.vol}" min="-96" max="24">
+      </div>
+      <div class="gen-area">
+        ${dyns.length && S.opts.dyn==='all' ? `<div class="wmsg">${dyns.length} velocity layers detected — Hexatone plays one layer, pick one above to avoid overlaps.</div>` : ''}
+        ${badN?`<div class="wmsg">${badN} OGG file${badN!==1?'s':''} won't play in Hexatone — exclude or convert to WAV.</div>`:''}
+        ${unknN?`<div class="wmsg">${unknN} sample${unknN!==1?'s':''} without a note — click the “?” to assign.</div>`:''}
+        <button class="btn pri" id="btn-gen" ${validN===0?'disabled':''}>Generate SFZ →</button>
+      </div>
+    </div>`;
+
+  } else if (S.view==='preview') {
+    html += `<div class="prev-hdr">
+      <span class="prev-meta">${rc} region${rc!==1?'s':''} · ${S.sfz.length} chars</span>
+      <div class="prev-btns">
+        <button class="btn gst sm" id="btn-back">← Back</button>
+        <button class="btn gst sm" id="btn-copy">Copy</button>
+        <button class="btn pri sm" id="btn-dl">↓ Download .sfz</button>
+      </div>
+    </div>
+    <pre class="sfz">${sfzHL(S.sfz)}</pre>`;
+  }
+
+  html += `</main>`;
+  app.innerHTML = html;
+
+  // ── listeners ──
+  const fi = document.getElementById('fi'), foi = document.getElementById('foi');
+  const on = (id, fn) => { const el=document.getElementById(id); if(el) el.onclick=fn; };
+
+  on('btn-sf', ()=>fi.click());   on('btn-sfd', ()=>foi.click());
+  on('btn-af', ()=>fi.click());   on('btn-afd', ()=>foi.click());
+  on('btn-back', ()=>{ S.view='files'; render(); });
+  on('btn-gen',  ()=>{ S.sfz=makeSFZ(S.files,S.opts); S.view='preview'; render(); });
+  on('btn-copy', ()=>{
+    navigator.clipboard?.writeText(S.sfz).then(()=>{
+      const b=document.getElementById('btn-copy');
+      if(b){ b.textContent='✓ Copied'; b.style.color='var(--accent5)'; b.style.borderColor='var(--accent5)'; }
+    });
+  });
+  on('btn-dl', ()=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([S.sfz],{type:'text/plain'}));
+    a.download='instrument.sfz'; a.click();
+  });
+
+  const bind = (id, ev, fn) => { const el=document.getElementById(id); if(el) el.addEventListener(ev, fn); };
+  bind('opt-oct',  'change', e=>{ S.opts.octave=parseInt(e.target.value)||0; render(); });
+  bind('opt-semi', 'change', e=>{ S.opts.semi=Math.max(-11,Math.min(11,parseInt(e.target.value)||0)); render(); });
+  bind('opt-dyn',  'change', e=>{ S.opts.dyn=e.target.value; render(); });
+  bind('opt-loop', 'change', e=>{ S.opts.loop=e.target.value; });
+  bind('opt-vol',  'change', e=>{ S.opts.vol=parseFloat(e.target.value)||0; });
+
+  const dzSetup = (id) => {
+    const el = document.getElementById(id); if(!el) return;
+    el.addEventListener('dragover',  e=>{ e.preventDefault(); el.classList.add('over'); });
+    el.addEventListener('dragleave', ()=>el.classList.remove('over'));
+    el.addEventListener('drop', e=>{ e.preventDefault(); el.classList.remove('over'); addFiles(e.dataTransfer.files); });
+  };
+  dzSetup('dz'); dzSetup('dm');
+
+  if (_delListen) app.removeEventListener('click', _delListen);
+  _delListen = e => {
+    const t = e.target.closest('[data-act]'); if (!t) return;
+    const { act, id } = t.dataset;
+    if (act==='edit') startEdit(id);
+    if (act==='excl') { S.files=S.files.map(f=>f.id===id?{...f,excl:!f.excl}:f); render(); }
+    if (act==='rm')   { S.files=S.files.filter(f=>f.id!==id); if(!S.files.length) S.view='drop'; render(); }
+  };
+  app.addEventListener('click', _delListen);
+
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ S.view=t.dataset.v; render(); }));
+}
+
+// ── Inline note editing ─────────────────────────────────────────────────────
+function startEdit(id) {
+  const cell = document.getElementById('nc-'+id); if (!cell) return;
+  const f = S.files.find(x=>x.id===id);
+  const val = f&&f.midi!=null ? m2n(f.midi) : '';
+  cell.innerHTML = `<input class="edit-in" id="ei-${id}" value="${esc(val)}" placeholder="C3" autocomplete="off">`;
+  const inp = document.getElementById('ei-'+id); if (!inp) return;
+  inp.focus(); inp.select();
+  const commit = () => {
+    const v = inp.value.trim();
+    let midi = v ? n2m(v) : null;
+    if (midi==null && v && /^\d+$/.test(v)) { const n=parseInt(v); if(n>=0&&n<=127) midi=n; }
+    if (v && midi==null) { inp.classList.add('err'); return; }
+    S.files = S.files.map(x=>x.id===id?{...x,midi}:x);
+    render();
+  };
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e=>{
+    if (e.key==='Enter') { e.preventDefault(); inp.removeEventListener('blur',commit); commit(); }
+    if (e.key==='Escape') render();
+  });
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+const fi = document.getElementById('fi'), foi = document.getElementById('foi');
+foi.setAttribute('webkitdirectory',''); foi.setAttribute('directory','');
+fi.onchange  = e=>{ addFiles(e.target.files); e.target.value=''; };
+foi.onchange = e=>{ addFiles(e.target.files); e.target.value=''; };
+render();
+</script>
+</body>
+</html>
