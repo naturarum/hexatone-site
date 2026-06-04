@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexatone — Isomorphic Hexagonal Keyboard & Microtonal Instrument for iPad</title>
+    <meta name="description" content="Hexatone is an isomorphic hexagonal keyboard and microtonal instrument for iPad. Play any tuning, use the built-in sampler, and explore beautiful isomorphic layouts.">
+    <meta name="theme-color" content="#0d0d11">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Social sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Hexatone — Microtonal Hexagonal Instrument for iPad">
+    <meta property="og:description" content="An isomorphic hexagonal keyboard and microtonal instrument for iPad. Any tuning, a built-in sampler, beautiful layouts.">
+    <meta property="og:image" content="icon.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Hexatone — Microtonal Hexagonal Instrument for iPad">
+    <meta name="twitter:description" content="Any tuning, a built-in sampler, beautiful isomorphic layouts. For iPad.">
+    <meta name="twitter:image" content="icon.png">
+
+    <style>
+        :root {
+            --bg: #0d0d11;
+            --bg-card: #14141a;
+            --bg-card-hover: #1a1a22;
+            --text: #e4e4e8;
+            --text-muted: #a0a0ae;
+            --text-dim: #6b6b7a;
+            /* Hexatone pastel palette (matches the app: warm white → orange → pink →
+               lavender → blue → cyan) */
+            --accent: #ffa9c9;          /* pink */
+            --accent-glow: rgba(255, 169, 201, 0.22);
+            --accent2: #8cb8ff;         /* blue */
+            --accent2-glow: rgba(140, 184, 255, 0.18);
+            --accent3: #cfa9ff;         /* lavender */
+            --accent4: #ffbd82;         /* pastel orange */
+            --accent5: #9ee6e6;         /* cyan */
+            --border: #22222b;
+            --border-light: #2a2a35;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+            --max-width: 820px;
+            --nav-height: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(169, 214, 229, 0.05) 0%, transparent 70%),
+                radial-gradient(ellipse at 30% 40%, rgba(247, 178, 198, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 70%, rgba(230, 195, 243, 0.04) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 13, 17, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+        }
+        nav .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav .nav-brand {
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        nav .nav-brand .hex-dot {
+            width: 18px;
+            height: 10.4px;
+            background: var(--accent);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+        nav .nav-cta {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+        nav .nav-cta:hover {
+            background: rgba(247, 178, 198, 0.1);
+            border-color: var(--accent);
+            color: #fdd4df;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 0 56px;
+        }
+        .hero .app-icon-placeholder {
+            width: 96px;
+            height: 96px;
+            border-radius: 22px;
+            margin: 0 auto 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 44px rgba(140, 184, 255, 0.18),
+                        0 8px 24px rgba(0, 0, 0, 0.55),
+                        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+        }
+        .hero .app-icon-placeholder .inner-hex {
+            width: 32px;
+            height: 18.5px;
+            background: var(--accent);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            opacity: 0.7;
+            animation: hexPulse 3s ease-in-out infinite;
+        }
+        @keyframes hexPulse {
+            0%, 100% { opacity: 0.55; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.12); }
+        }
+        .hero .app-icon-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .hero h1 {
+            font-size: clamp(2.6rem, 6vw, 3.8rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+            margin-bottom: 14px;
+            color: #f5f5f8;
+        }
+        .hero h1 .accent {
+            background: linear-gradient(100deg,
+                var(--accent4) 0%, var(--accent) 28%, var(--accent3) 52%,
+                var(--accent2) 76%, var(--accent5) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--accent);   /* fallback */
+        }
+        .hero .tagline {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto 32px;
+            letter-spacing: -0.01em;
+            line-height: 1.5;
+        }
+        .hero .cta-group {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-appstore {
+            display: inline-block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-appstore:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px var(--accent-glow);
+        }
+        .btn-appstore img {
+            height: 44px;
+            display: block;
+        }
+        .btn-secondary {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 24px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: #444;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .features {
+            padding: 20px 0 60px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 600px) {
+            .features-grid { grid-template-columns: 1fr; }
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 22px;
+            transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+            transform: translateY(-1px);
+        }
+        .feature-card .card-hex {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 80px;
+            height: 46px;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            opacity: 0.05;
+            pointer-events: none;
+        }
+        .feature-card:nth-child(1) .card-hex { background: var(--accent4); }
+        .feature-card:nth-child(2) .card-hex { background: var(--accent); }
+        .feature-card:nth-child(3) .card-hex { background: var(--accent3); }
+        .feature-card:nth-child(4) .card-hex { background: var(--accent2); }
+
+        .feature-card .card-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .feature-card h3 {
+            font-size: 1.15rem;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+            color: #eaeaef;
+        }
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 8px;
+        }
+        .feature-card ul li {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 3px 0 3px 18px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .feature-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 9px;
+            width: 6px;
+            height: 3.5px;
+            background: currentColor;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            opacity: 0.5;
+        }
+
+        .details {
+            padding: 10px 0 50px;
+        }
+        .details-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            margin-bottom: 14px;
+        }
+        .details-card h3 {
+            font-size: 1rem;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+            color: #eaeaef;
+        }
+        .details-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .details-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .details-card .tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            color: var(--text-muted);
+            letter-spacing: -0.01em;
+        }
+
+        .contact {
+            padding: 20px 0 60px;
+        }
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            text-align: center;
+        }
+        .contact-card h3 {
+            font-size: 1.1rem;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+        .contact-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .contact-card .contact-email {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            margin-top: 8px;
+            transition: color 0.2s;
+            letter-spacing: -0.01em;
+        }
+        .contact-card .contact-email:hover {
+            color: #fdd4df;
+        }
+        .placeholder-note {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 0;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            letter-spacing: 0.01em;
+        }
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: var(--accent); }
+        footer .footer-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .bg-hexagons {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+        }
+        .bg-hex {
+            position: absolute;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            opacity: 0.03;
+        }
+        .bg-hex:nth-child(1) {
+            width: 200px; height: 115px;
+            background: var(--accent);
+            top: 8%; left: -4%;
+            transform: rotate(15deg);
+        }
+        .bg-hex:nth-child(2) {
+            width: 140px; height: 81px;
+            background: var(--accent2);
+            top: 55%; right: -3%;
+            transform: rotate(-10deg);
+        }
+        .bg-hex:nth-child(3) {
+            width: 100px; height: 58px;
+            background: var(--accent3);
+            bottom: 15%; left: 10%;
+            transform: rotate(22deg);
+        }
+        .bg-hex:nth-child(4) {
+            width: 160px; height: 92px;
+            background: var(--accent4);
+            top: 30%; right: 12%;
+            transform: rotate(8deg);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero, .features, .details, .contact {
+            animation: fadeUp 0.7s ease-out both;
+        }
+        .features { animation-delay: 0.1s; }
+        .details  { animation-delay: 0.2s; }
+        .contact  { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="bg-hexagons" aria-hidden="true">
+        <div class="bg-hex"></div>
+        <div class="bg-hex"></div>
+        <div class="bg-hex"></div>
+        <div class="bg-hex"></div>
+    </div>
+
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="nav-brand">
+                <span class="hex-dot" aria-hidden="true"></span>
+                Hexatone
+            </a>
+            <a href="https://apps.apple.com/app/id6775283069" class="nav-cta" target="_blank" rel="noopener">Download</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero container">
+            <!-- App icon -->
+            <div class="app-icon-placeholder">
+                <img src="icon.png" alt="Hexatone app icon" style="display:block;">
+            </div>
+
+            <h1><span class="accent">Hexatone</span></h1>
+            <p class="tagline">
+                An isomorphic hexagonal keyboard and microtonal instrument for iPad.
+                Every interval keeps the same shape anywhere on the grid — scales and chords
+                are easy to learn and transpose, in any tuning. With the built-in sampler,
+                it makes its own sound, in tune, with no extra apps required.
+            </p>
+            <div class="cta-group">
+                <a href="https://apps.apple.com/app/id6775283069" class="btn-appstore" target="_blank" rel="noopener" aria-label="Download Hexatone on the App Store">
+                    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="44" loading="eager">
+                </a>
+                <a href="#contact" class="btn-secondary">Get in Touch</a>
+            </div>
+        </section>
+
+        <section class="features container" id="features">
+            <p class="section-title">Key Features</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="card-hex" aria-hidden="true"></div>
+                    <span class="card-label">Tuning</span>
+                    <h3>Play Any Tuning</h3>
+                    <p>
+                        Any equal temperament (N-EDO): 12, 19, 22, 24, 31, 53 and beyond.
+                        Import your own scales as Scala (.scl) files — keys show their ratios.
+                        Adjustable octave, concert pitch (A4), and key density.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-hex" aria-hidden="true"></div>
+                    <span class="card-label">Sound Engine</span>
+                    <h3>Built-in Sampler</h3>
+                    <p>
+                        Load a single audio file and play it across the whole board, perfectly in tune.
+                        Or import full multisample instruments (SFZ) — pianos, kalimbas, pads, anything.
+                        Manage your instrument library and reclaim space, right in the app.
+                    </p>
+                    <ul>
+                        <li>No external synth needed</li>
+                        <li>Send MIDI simultaneously</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="card-hex" aria-hidden="true"></div>
+                    <span class="card-label">Layout</span>
+                    <h3>Isomorphic Layouts</h3>
+                    <p>
+                        Bosanquet, Wicki-Hayden, Harmonic Table, Fourths, Accordion — or a fully
+                        Custom layout. Every interval keeps its shape across the entire grid.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-hex" aria-hidden="true"></div>
+                    <span class="card-label">Design</span>
+                    <h3>Beautiful, Readable Keys</h3>
+                    <p>
+                        Glassy, glowing keys that light up as you play. Four colour palettes
+                        (Pastel, Inferno, Turquoise, Campfire) — hue shows pitch class,
+                        brightness shows octave, so you can read the keyboard at a glance.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="details container" id="details">
+            <p class="section-title">Works Everywhere</p>
+            <div class="details-card">
+                <h3>Standalone & AUv3 Plugin</h3>
+                <p>
+                    Use Hexatone on its own, or as an AUv3 plugin inside
+                    AUM, Logic Pro, GarageBand, Cubasis, Loopy Pro, Drambo, and more.
+                </p>
+                <div class="tags">
+                    <span class="tag">AUv3</span>
+                    <span class="tag">Standalone</span>
+                    <span class="tag">iPad</span>
+                </div>
+            </div>
+            <div class="details-card">
+                <h3>MPE Pitch Output</h3>
+                <p>
+                    Hexatone uses MPE for per-note microtonal pitch: each note plays on its own
+                    channel with its own pitch bend, so MPE-capable synths sound every microtonal
+                    interval in tune. Note velocity, a velocity curve, and an adjustable pitch-bend
+                    range round out the control.
+                </p>
+                <p style="margin-top: 10px; color: var(--text-dim); font-size: 0.85rem;">
+                    A note on MPE: Hexatone sends the per-note pitch (X) dimension. The continuous
+                    Y (timbre / CC74) and Z (pressure) expression of touch controllers like the
+                    Seaboard isn't sent yet — a flat screen can't natively sense those. Richer touch
+                    expression is on the roadmap.
+                </p>
+                <div class="tags">
+                    <span class="tag">MPE Pitch</span>
+                    <span class="tag">Per-note Pitch Bend</span>
+                    <span class="tag">Velocity Curve</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact container" id="contact">
+            <p class="section-title">Contact</p>
+            <div class="contact-card">
+                <h3>Get in Touch</h3>
+                <p>Questions, feedback, or press inquiries — I'd love to hear from you.</p>
+                <a href="mailto:deepchord@icloud.com" class="contact-email">deepchord@icloud.com</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        <div class="footer-links">
+            <a href="https://apps.apple.com/app/id6775283069" target="_blank" rel="noopener">App Store</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <p>&copy; <span id="current-year">2026</span> Hexatone. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
