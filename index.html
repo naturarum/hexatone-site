@@ -273,6 +273,7 @@
         .feature-card:nth-child(2) .card-hex { background: var(--accent); }
         .feature-card:nth-child(3) .card-hex { background: var(--accent3); }
         .feature-card:nth-child(4) .card-hex { background: var(--accent2); }
+        .feature-card:nth-child(5) .card-hex { background: var(--accent5); }
 
         .feature-card .card-label {
             font-size: 0.7rem;
@@ -649,8 +650,8 @@
             <p class="tagline">
                 An isomorphic hexagonal keyboard and microtonal instrument for iPad.
                 Every interval keeps the same shape anywhere on the grid, so scales and chords
-                are easy to learn and transpose, in any tuning. With the built-in sampler,
-                it makes its own sound, in tune, with no extra apps required.
+                are easy to learn and transpose, in any tuning. It makes its own sound, in tune,
+                with built-in voices and a sampler, and no extra apps required.
             </p>
             <div class="cta-group">
                 <a href="https://apps.apple.com/app/id6775283069" class="btn-appstore" target="_blank" rel="noopener" aria-label="Download Hexatone on the App Store">
@@ -675,17 +676,28 @@
                 </div>
                 <div class="feature-card">
                     <div class="card-hex" aria-hidden="true"></div>
-                    <span class="card-label">Sound Engine</span>
-                    <h3>Built-in Sampler</h3>
+                    <span class="card-label">Sound</span>
+                    <h3>A Sound of Its Own</h3>
                     <p>
-                        Load a single audio file and play it across the whole board, perfectly in tune.
-                        Or import full multisample instruments (SFZ): pianos, kalimbas, pads, anything.
-                        Manage your instrument library and reclaim space, right in the app.
+                        Two built-in voices play in tune out of the box: a struck bell and a
+                        sustaining glass tone. Or load a single sample, or a full multisample
+                        instrument (SFZ) as a folder or a .zip. Name, rename, and manage your
+                        library right in the app.
                     </p>
                     <ul>
                         <li>No external synth needed</li>
-                        <li>Send MIDI simultaneously</li>
+                        <li>Send MIDI at the same time</li>
                     </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="card-hex" aria-hidden="true"></div>
+                    <span class="card-label">Playing</span>
+                    <h3>Play Hands-Free</h3>
+                    <p>
+                        Hold mode sustains a chord after you lift your fingers, so you can layer
+                        notes and let them ring. Tap a held key to drop it, and choose how many
+                        voices play at once.
+                    </p>
                 </div>
                 <div class="feature-card">
                     <div class="card-hex" aria-hidden="true"></div>
@@ -1200,7 +1212,7 @@
             html += `<tr class="${f.excl?'excl':''}" data-id="${f.id}">
               <td style="color:var(--text-dim)">${i+1}</td>
               <td style="text-align:center"><button class="pbtn" data-act="play" data-id="${f.id}" ${f.audio?'':'disabled'} title="Audition">▶</button></td>
-              <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${nameColor}" title="${esc(f.path)}${statusTitle?' — '+statusTitle:''}">${flag}${esc(f.path)}${f.decode==='pending'?' <span style="color:var(--accent2);font-size:0.75em">decoding…</span>':''}</td>
+              <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${nameColor}" title="${esc(f.path)}${statusTitle?' · '+statusTitle:''}">${flag}${esc(f.path)}${f.decode==='pending'?' <span style="color:var(--accent2);font-size:0.75em">decoding…</span>':''}</td>
               <td style="text-align:center" id="nc-${f.id}">
                 <span class="note-tag ${f.midi!=null?'kn':'unk'}" data-act="edit" data-id="${f.id}">${f.midi!=null?m2n(effMidi(f,o)):'?'}</span>${dot}
               </td>
