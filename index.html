@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hexatone: Isomorphic Hexagonal Keyboard and Microtonal Instrument for iPad</title>
     <meta name="description" content="Hexatone is an isomorphic hexagonal keyboard and microtonal instrument for iPad. Play any tuning, use the built-in sampler, and explore beautiful isomorphic layouts.">
-    <meta name="theme-color" content="#0d0d11">
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#0d0d11" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <link rel="apple-touch-icon" href="img/icon.png">
 
     <!-- Social sharing -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Hexatone: Microtonal Hexagonal Instrument for iPad">
     <meta property="og:description" content="An isomorphic hexagonal keyboard and microtonal instrument for iPad. Any tuning, a built-in sampler, beautiful layouts.">
-    <meta property="og:image" content="icon.png">
+    <meta property="og:image" content="img/icon.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Hexatone: Microtonal Hexagonal Instrument for iPad">
     <meta name="twitter:description" content="Any tuning, a built-in sampler, beautiful isomorphic layouts. For iPad.">
-    <meta name="twitter:image" content="icon.png">
+    <meta name="twitter:image" content="img/icon.png">
 
     <style>
         :root {
@@ -103,11 +104,12 @@
         }
         nav .nav-brand .hex-dot {
             width: 18px;
-            height: 10.4px;
+            height: 15.6px;
             background: var(--accent);
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             flex-shrink: 0;
             opacity: 0.9;
+            filter: drop-shadow(0 0 6px var(--accent-glow));
         }
         nav .nav-cta {
             font-size: 0.875rem;
@@ -149,11 +151,15 @@
         }
         .hero .app-icon-placeholder .inner-hex {
             width: 32px;
-            height: 18.5px;
+            height: 27.7px;
             background: var(--accent);
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             opacity: 0.7;
             animation: hexPulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px var(--accent));
+            position: absolute;
+            top: 50%; left: 50%;
+            margin-top: -13.85px; margin-left: -16px;
         }
         @keyframes hexPulse {
             0%, 100% { opacity: 0.55; transform: scale(1); }
@@ -164,6 +170,32 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        .hero-images {
+            position: relative;
+            width: 100%;
+            max-width: 660px;
+            margin: 50px auto 0;
+            height: 360px; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        .hero-images img {
+            position: absolute;
+            width: 36%;
+            border-radius: 8px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease;
+            top: 50%;
+        }
+        .hero-images img:nth-child(1) { left: 4%; transform: translateY(-50%) scale(0.85) rotate(-5deg); z-index: 1; opacity: 0.6; }
+        .hero-images img:nth-child(2) { left: 32%; z-index: 3; transform: translateY(-50%) scale(1.02); }
+        .hero-images img:nth-child(3) { right: 4%; transform: translateY(-50%) scale(0.85) rotate(5deg); z-index: 2; opacity: 0.6; }
+        .hero-images:hover img:nth-child(1) { transform: translateY(-50%) scale(0.88) rotate(-7deg) translateX(-15px); opacity: 0.85; }
+        .hero-images:hover img:nth-child(3) { transform: translateY(-50%) scale(0.88) rotate(7deg) translateX(15px); opacity: 0.85; }
+        .hero-images:hover img:nth-child(2) { transform: translateY(-50%) scale(1.05) translateY(-8px); }
+        @media (max-width: 768px) {
+            .hero-images { height: auto; position: static; display: grid; gap: 24px; justify-items: center; margin-top: 40px; margin-bottom: 0; }
+            .hero-images img { position: static; width: 75%; transform: none !important; opacity: 1 !important; margin: 0; }
         }
         .hero h1 {
             font-size: clamp(2.6rem, 6vw, 3.8rem);
@@ -246,28 +278,37 @@
             .features-grid { grid-template-columns: 1fr; }
         }
         .feature-card {
-            background: var(--bg-card);
+            background: rgba(20, 20, 26, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 24px 22px;
-            transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
         .feature-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-light);
-            transform: translateY(-1px);
+            background: rgba(26, 26, 34, 0.85);
+            border-color: var(--accent-glow);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--accent-glow);
         }
         .feature-card .card-hex {
             position: absolute;
             top: -30px;
             right: -30px;
             width: 80px;
-            height: 46px;
+            height: 69.3px;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             opacity: 0.05;
             pointer-events: none;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+        .feature-card:hover .card-hex {
+            transform: scale(1.1) rotate(5deg);
+            opacity: 0.15;
         }
         .feature-card:nth-child(1) .card-hex { background: var(--accent4); }
         .feature-card:nth-child(2) .card-hex { background: var(--accent); }
@@ -313,7 +354,7 @@
             left: 0;
             top: 9px;
             width: 6px;
-            height: 3.5px;
+            height: 5.2px;
             background: currentColor;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             opacity: 0.5;
@@ -323,11 +364,19 @@
             padding: 10px 0 50px;
         }
         .details-card {
-            background: var(--bg-card);
+            background: rgba(20, 20, 26, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 28px 24px;
             margin-bottom: 14px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .details-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-light);
         }
         .details-card h3 {
             font-size: 1rem;
@@ -428,47 +477,44 @@
             width: 100%; height: 100%;
             overflow: hidden;
         }
+        @keyframes breathe {
+            0%, 100% { transform: rotate(var(--rot)) translateY(0) scale(1); opacity: 0.03; }
+            50% { transform: rotate(var(--rot)) translateY(-15px) scale(1.02); opacity: 0.06; }
+        }
         .bg-hex {
             position: absolute;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            opacity: 0.03;
+            animation: breathe 12s ease-in-out infinite;
         }
         .bg-hex:nth-child(1) {
-            width: 200px; height: 115px;
-            background: var(--accent);
-            top: 8%; left: -4%;
-            transform: rotate(15deg);
+            --rot: 15deg; width: 200px; height: 173.2px; background: var(--accent); top: 8%; left: -4%;
         }
         .bg-hex:nth-child(2) {
-            width: 140px; height: 81px;
-            background: var(--accent2);
-            top: 55%; right: -3%;
-            transform: rotate(-10deg);
+            --rot: -10deg; width: 140px; height: 121.2px; background: var(--accent2); top: 55%; right: -3%; animation-delay: -3s;
         }
         .bg-hex:nth-child(3) {
-            width: 100px; height: 58px;
-            background: var(--accent3);
-            bottom: 15%; left: 10%;
-            transform: rotate(22deg);
+            --rot: 22deg; width: 100px; height: 86.6px; background: var(--accent3); bottom: 15%; left: 10%; animation-delay: -6s;
         }
         .bg-hex:nth-child(4) {
-            width: 160px; height: 92px;
-            background: var(--accent4);
-            top: 30%; right: 12%;
-            transform: rotate(8deg);
+            --rot: 8deg; width: 160px; height: 138.6px; background: var(--accent4); top: 30%; right: 12%; animation-delay: -9s;
         }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(18px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .hero, .features, .details, .contact, .sfzb-section {
+        .hero {
             animation: fadeUp 0.7s ease-out both;
         }
-        .features { animation-delay: 0.1s; }
-        .details  { animation-delay: 0.2s; }
-        .sfzb-section { animation-delay: 0.25s; }
-        .contact  { animation-delay: 0.3s; }
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* ─── SFZ Builder (scoped to #sfzb) ─────────────────────────────── */
         .sfzb-section { padding: 20px 0 50px; }
@@ -509,7 +555,7 @@
         }
         #sfzb .drop-zone.over { border-color: var(--accent); background: var(--bg-card-hover); }
         #sfzb .di {
-            width: 56px; height: 32px; margin: 0 auto 18px;
+            width: 56px; height: 48.5px; margin: 0 auto 18px;
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             background: var(--border-light); transition: background .2s;
         }
@@ -578,13 +624,22 @@
         #sfzb input[type=number] { width: 84px; }
         #sfzb .gen-area { margin-left: auto; text-align: right; }
         #sfzb .wmsg { font-size: 0.78rem; color: var(--warn); margin-bottom: 8px; max-width: 360px; margin-left: auto; }
-        #sfzb .prev-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        #sfzb .prev-hdr { 
+            display: flex; align-items: center; margin-bottom: 0; flex-wrap: wrap; gap: 10px; 
+            background: #18181f; padding: 12px 18px; border-radius: var(--radius) var(--radius) 0 0;
+            border: 1px solid var(--border); border-bottom: none;
+        }
+        #sfzb .mac-dots { display: flex; gap: 6px; margin-right: 14px; }
+        #sfzb .mac-dots span { width: 11px; height: 11px; border-radius: 50%; background: #444; }
+        #sfzb .mac-dots span:nth-child(1) { background: #ff5f56; }
+        #sfzb .mac-dots span:nth-child(2) { background: #ffbd2e; }
+        #sfzb .mac-dots span:nth-child(3) { background: #27c93f; }
         #sfzb .prev-meta { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.02em; }
-        #sfzb .prev-btns { display: flex; gap: 8px; }
+        #sfzb .prev-btns { display: flex; gap: 8px; margin-left: auto; }
         #sfzb pre.sfz {
-            background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: var(--radius);
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius);
             padding: 22px; font-size: 0.82rem; line-height: 1.85; overflow: auto; max-height: 56vh;
-            white-space: pre; font-family: var(--mono);
+            white-space: pre; font-family: var(--mono); margin-top: 0;
         }
         #sfzb .sc { color: var(--text-dim); }
         #sfzb .st { color: var(--accent); font-weight: 700; }
@@ -597,7 +652,7 @@
         .sfzb-how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0 4px; }
         @media (max-width: 600px) { .sfzb-how { grid-template-columns: 1fr; } }
         .sfzb-step { display: flex; gap: 12px; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 16px; }
-        .sfzb-step-n { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; color: #1a1020; background: linear-gradient(120deg, var(--accent), var(--accent3)); }
+        .sfzb-step-n { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; color: var(--accent); background: rgba(255, 169, 201, 0.15); border: 1px solid var(--accent); }
         .sfzb-step b { display: block; font-size: 0.92rem; color: #eaeaef; margin-bottom: 2px; letter-spacing: -0.01em; }
         .sfzb-step span { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
         .sfzb-explain { margin-top: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px 18px; }
@@ -619,6 +674,78 @@
         #sfzb .pnrow label { font-size: 0.68rem; letter-spacing: 0.05em; color: var(--text-dim); font-weight: 600; }
         #sfzb .pn-in { flex: 1; min-width: 160px; max-width: 280px; background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text); padding: 7px 11px; font-size: 0.85rem; font-family: inherit; border-radius: 8px; outline: none; }
         #sfzb .pn-in:focus { border-color: var(--accent); }
+
+        /* ─── Light Mode ──────────────────────────────────────────────────────── */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f2f2f7;
+                --bg-card: #ffffff;
+                --bg-card-hover: #fcfcfc;
+                --text: #1d1d1f;
+                --text-muted: #444446;
+                --text-dim: #666668;
+                
+                --accent: #ff4d8d;
+                --accent-glow: rgba(255, 77, 141, 0.22);
+                --accent2: #4a8cff;
+                --accent2-glow: rgba(74, 140, 255, 0.18);
+                --accent3: #9b51e0;
+                --accent4: #e07000;
+                --accent5: #00a0a0;
+                
+                --border: #d2d2d7;
+                --border-light: #e5e5ea;
+            }
+            body {
+                background-image:
+                    radial-gradient(ellipse at 50% 0%, rgba(74, 140, 255, 0.05) 0%, transparent 70%),
+                    radial-gradient(ellipse at 30% 40%, rgba(255, 77, 141, 0.04) 0%, transparent 60%),
+                    radial-gradient(ellipse at 70% 70%, rgba(155, 81, 224, 0.04) 0%, transparent 60%);
+            }
+            nav {
+                background: rgba(242, 242, 247, 0.75);
+            }
+            nav .nav-cta:hover {
+                background: rgba(255, 77, 141, 0.1);
+                color: #e02255;
+            }
+            .hero h1 { color: #000; }
+            .hero h1 .accent {
+                background: linear-gradient(100deg, #ffbd82 0%, #ffa9c9 28%, #cfa9ff 52%, #8cb8ff 76%, #9ee6e6 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .hero .app-icon-placeholder {
+                box-shadow: 0 16px 44px rgba(74, 140, 255, 0.18),
+                            0 8px 24px rgba(0, 0, 0, 0.15),
+                            0 0 0 1px rgba(0, 0, 0, 0.06) inset;
+            }
+            .btn-secondary:hover {
+                background: rgba(0, 0, 0, 0.04);
+                border-color: #aaa;
+            }
+            .feature-card, .details-card {
+                background: rgba(255, 255, 255, 0.65);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            }
+            .feature-card:hover {
+                background: rgba(255, 255, 255, 0.85);
+                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08), 0 0 15px var(--accent-glow);
+            }
+            .feature-card h3, .details-card h3 { color: #111; }
+            .details-card .tag { background: rgba(0, 0, 0, 0.03); }
+            .contact-card .contact-email:hover { color: #e02255; }
+            
+            .section-title { color: #666; }
+            .sfzb-title { color: #111; }
+            .sfzb-step b, .sfzb-explain summary, #sfzb .dt { color: #111; }
+            #sfzb .btn.pri { color: #fff; }
+            #sfzb .prev-hdr { background: #e5e5ea; }
+            #sfzb pre.sfz { background: rgba(255,255,255,0.8); }
+            #sfzb .sfzb-step-n { color: #fff; background: var(--accent); }
+            #sfzb .drop-zone { background: rgba(255,255,255,0.5); }
+        }
     </style>
 </head>
 <body>
@@ -643,7 +770,7 @@
         <section class="hero container">
             <!-- App icon -->
             <div class="app-icon-placeholder">
-                <img src="icon.png" alt="Hexatone app icon" style="display:block;">
+                <img src="img/icon.png" alt="Hexatone app icon" style="display:block;">
             </div>
 
             <h1><span class="accent">Hexatone</span></h1>
@@ -657,11 +784,19 @@
                 <a href="https://apps.apple.com/app/id6775283069" class="btn-appstore" target="_blank" rel="noopener" aria-label="Download Hexatone on the App Store">
                     <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="44" loading="eager">
                 </a>
+                <a href="https://www.youtube.com/shorts/nB9aX6HUDzI" class="btn-secondary" target="_blank" rel="noopener">Watch Promo</a>
                 <a href="#contact" class="btn-secondary">Get in Touch</a>
+            </div>
+
+            <!-- Hero Images -->
+            <div class="hero-images">
+                <img src="img/v12-01-microtonal.png" alt="Hexatone Microtonal Interface">
+                <img src="img/v12-02-sampler.png" alt="Hexatone Built-in Sampler">
+                <img src="img/v12-03-midi.png" alt="Hexatone MIDI MPE Output">
             </div>
         </section>
 
-        <section class="features container" id="features">
+        <section class="features container reveal" id="features">
             <p class="section-title">Key Features</p>
             <div class="features-grid">
                 <div class="feature-card">
@@ -721,7 +856,7 @@
             </div>
         </section>
 
-        <section class="details container" id="details">
+        <section class="details container reveal" id="details">
             <p class="section-title">Works Everywhere</p>
             <div class="details-card">
                 <h3>Standalone & AUv3 Plugin</h3>
@@ -775,7 +910,7 @@
             </div>
         </section>
 
-        <section class="sfzb-section container" id="sfz-builder">
+        <section class="sfzb-section container reveal" id="sfz-builder">
             <p class="section-title">Free Companion Tool</p>
             <h2 class="sfzb-title">SFZ Builder</h2>
             <p class="builder-intro">
@@ -832,7 +967,7 @@
             <input id="sfz-foi" type="file" multiple accept=".wav,.flac,.aif,.aiff,.caf,.m4a,.mp3,.ogg" style="display:none">
         </section>
 
-        <section class="contact container" id="contact">
+        <section class="contact container reveal" id="contact">
             <p class="section-title">Contact</p>
             <div class="contact-card">
                 <h3>Get in Touch</h3>
@@ -1267,6 +1402,7 @@
         } else if (S.view==='preview') {
           const rc = (S.sfz.match(/^<region>/mg)||[]).length;
           html += `<div class="prev-hdr">
+            <div class="mac-dots"><span></span><span></span><span></span></div>
             <span class="prev-meta">${rc} region${rc!==1?'s':''} · ${S.sfz.length} chars</span>
             <div class="prev-btns">
               <button class="btn gst sm" id="btn-back">← Back</button>
@@ -1394,6 +1530,19 @@
       foi.onchange = e=>{ addFiles(e.target.files); e.target.value=''; };
       render();
     })();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
     </script>
 </body>
 </html>
